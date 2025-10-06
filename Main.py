@@ -15,7 +15,7 @@ import os
 AUDIO = os.path.abspath("resources/athan.mp3")
 
 # Change Masjid_id to your nearest masjid. For example: "al-haram-makkah-saudi-arabia".
-MASJID_ID = "massjid-essalam-sankt-augustin"
+MASJID_ID = "your-masjid-id-here"
 
 # --- Configure logging ---
 logging.basicConfig(
@@ -130,7 +130,6 @@ def main() -> None:
     return
 
 if __name__ == "__main__":
-    play_athan()
-    #main()
+    main()
 
 
