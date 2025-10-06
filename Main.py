@@ -15,7 +15,7 @@ import os
 AUDIO = os.path.abspath("resources/athan.mp3")
 
 # Change Masjid_id to your nearest masjid. For example: "al-haram-makkah-saudi-arabia".
-MASJID_ID = "your-masjid-id-here"
+MASJID_ID = "massjid-essalam-sankt-augustin"
 
 # --- Configure logging ---
 logging.basicConfig(
@@ -108,6 +108,9 @@ def main() -> None:
     """Gonna blame chatgpt if this breaks"""
 
     scheduler = BackgroundScheduler()
+    
+    # Prevent minor scheduling delays
+    scheduler.configure(job_defaults={'misfire_grace_time': 59})  
     scheduler.start()
 
     # Fetch & schedule once at startup
