@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-import playsound
+import pygame
 import requests
 import logging
 import json
@@ -85,7 +85,9 @@ def play_athan() -> None:
     if not os.path.exists(AUDIO):
             raise FileNotFoundError(f"Athan audio file not found at {AUDIO}")
     try:
-        playsound.playsound(AUDIO)
+        pygame.init()
+        pygame.mixer.Sound(AUDIO).play()
+        time.sleep(133)
     except Exception as e:
         logging.error(f"Error playing Athan: {e}")
         return
@@ -108,7 +110,7 @@ def main() -> None:
     """Gonna blame chatgpt if this breaks"""
 
     scheduler = BackgroundScheduler()
-    
+
     # Prevent minor scheduling delays
     scheduler.configure(job_defaults={'misfire_grace_time': 59})  
     scheduler.start()
@@ -128,6 +130,7 @@ def main() -> None:
     return
 
 if __name__ == "__main__":
-    main()
+    play_athan()
+    #main()
 
 
