@@ -43,7 +43,7 @@ def fetch_prayer_times_from_mawaqit(masjid_id:str):
     Raises:
         HTTPException: If the masjid is not found or the prayer times cannot be extracted.
     """
-    url = f"https://mawaqit.net/fr/{masjid_id}"
+    url = f"https://mawaqit.net/de/m/{masjid_id}"
 
     try:
         r = requests.get(url, timeout=10)
