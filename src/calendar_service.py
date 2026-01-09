@@ -64,7 +64,7 @@ def fetch_calendar_from_mawaqit(masjid_id: str) -> None:
         r = requests.get(url, timeout=10)
         r.raise_for_status()
     except requests.RequestException as e:
-        raise requests.RequestException(f"Failed to fetch calendar from Mawaqit: {e}")
+        raise requests.RequestException(f"Failed to fetch calendar from Mawaqit: {e}") from e
 
     soup = BeautifulSoup(r.text, "html.parser")
     script = soup.find("script", string=re.compile(r"var confData ="))

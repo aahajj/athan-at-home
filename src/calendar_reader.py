@@ -30,7 +30,7 @@ def get_today_prayer_times():
 
     try:
         prayer_times = data[month_key][day_key]
-    except (KeyError, IndexError):
+    except KeyError:
         raise RuntimeError(f"No prayer data for {today.isoformat()}")
 
     if len(prayer_times) < 5:
