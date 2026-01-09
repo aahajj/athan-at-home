@@ -12,8 +12,8 @@ def get_today_prayer_times():
         list: Prayer times as datetime.time objects (excludes sunrise)
         
     Raises:
-        RuntimeError: If calendar file is missing or data is invalid
         FileNotFoundError: If calendar file doesn't exist
+        RuntimeError: If calendar data is invalid or corrupted
     """
     if not os.path.exists(CALENDAR_PATH):
         raise FileNotFoundError(f"Calendar file not found at {CALENDAR_PATH}")
@@ -22,7 +22,7 @@ def get_today_prayer_times():
         with open(CALENDAR_PATH) as f:
             data = json.load(f)
     except (json.JSONDecodeError, IOError) as e:
-        raise RuntimeError(f"Failed to read calendar file: {e}")
+        raise RuntimeError(f"Failed to read calendar file: {e}") from e
 
     today = date.today()
     month_key = today.month - 1
