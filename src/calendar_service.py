@@ -64,7 +64,7 @@ def fetch_calendar_from_mawaqit(masjid_id: str) -> None:
         r = requests.get(url, timeout=10)
         r.raise_for_status()
     except requests.RequestException as e:
-        raise requests.RequestException(f"Failed to fetch calendar from Mawaqit: {e}") from e
+        raise RuntimeError(f"Failed to fetch calendar from Mawaqit: {e}") from e
 
     soup = BeautifulSoup(r.text, "html.parser")
     script = soup.find("script", string=re.compile(r"var confData ="))
@@ -79,8 +79,8 @@ def fetch_calendar_from_mawaqit(masjid_id: str) -> None:
     try:
         conf_data = json.loads(match.group(1))
         calendar = conf_data["calendar"]
-    except Exception as e:
-        raise RuntimeError(f"Failed to extract calendar from confData: {e}")
+    except (KeyError, TypeError, json.JSONDecodeError) as e:
+        raise RuntimeError(f"Failed to extract calendar from confData: {e}") from e
 
     # Validate calendar before replacing the existing one
     try:
