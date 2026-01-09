@@ -7,8 +7,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from calendar_service import fetch_calendar_from_mawaqit
 from scheduler_service import schedule_today_prayers
-    
-MASJID_ID = "massjid-ID"  # Replace with actual masjid ID
+from player import AUDIO
+
+# Get masjid ID from environment variable or use default placeholder
+MASJID_ID = os.getenv("MASJID_ID", "masjid-ID")
 
 os.makedirs(paths.OUT_DIR, exist_ok=True)
 
@@ -28,6 +30,20 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    """
+    Main entry point for the Athan application.
+    
+    Sets up the scheduler, fetches the calendar, and schedules daily prayers.
+    Runs continuously until interrupted with Ctrl+C.
+    """
+    # Validate audio file exists at startup
+    if not os.path.exists(AUDIO):
+        logger.error(f"Audio file not found at {AUDIO}. Athan will not play.")
+        logger.error("Please ensure the athan.mp3 file exists in the resources directory.")
+    
+    # Warn if using default MASJID_ID
+    if MASJID_ID == "masjid-ID":
+        logger.warning("Using default MASJID_ID. Set the MASJID_ID environment variable to configure your masjid.")
 
     scheduler = BackgroundScheduler(job_defaults={"misfire_grace_time": 60})
     scheduler.start()
@@ -61,9 +77,11 @@ def main():
     )
 
     try:
+        logger.info("Athan service started successfully")
         while True:
             time.sleep(60)
     except KeyboardInterrupt:
+        logger.info("Shutting down Athan service")
         scheduler.shutdown()
 
 

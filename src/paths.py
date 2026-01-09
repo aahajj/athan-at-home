@@ -1,3 +1,8 @@
+"""
+Path configuration for the Athan application.
+
+Defines standard paths for output files, logs, and calendars.
+"""
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -5,16 +5,22 @@ import logging
 import requests
 from paths import CALENDAR_PATH, CALENDAR_TMP_PATH
 from bs4 import BeautifulSoup
-from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
-
-import re
 
 TIME_PATTERN = re.compile(r"^\d{2}:\d{2}$")
 
 
 def validate_calendar(calendar) -> None:
+    """
+    Validate the structure and content of the calendar data.
+    
+    Args:
+        calendar: List of 12 monthly dictionaries containing prayer times
+        
+    Raises:
+        ValueError: If calendar structure or data is invalid
+    """
     if not isinstance(calendar, list):
         raise ValueError("Calendar must be a list")
 
@@ -43,7 +49,14 @@ def validate_calendar(calendar) -> None:
 def fetch_calendar_from_mawaqit(masjid_id: str) -> None:
     """
     Fetch monthly prayer calendar from Mawaqit and persist locally.
-    Failure is non-fatal; caller decides fallback behavior.
+    
+    Args:
+        masjid_id: The unique identifier for the masjid on Mawaqit
+        
+    Raises:
+        requests.RequestException: If network request fails
+        ValueError: If calendar data is invalid
+        RuntimeError: If calendar data cannot be parsed
     """
     url = f"https://mawaqit.net/de/m/{masjid_id}"
 
@@ -51,30 +64,31 @@ def fetch_calendar_from_mawaqit(masjid_id: str) -> None:
         r = requests.get(url, timeout=10)
         r.raise_for_status()
     except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=str(e))
+        raise RuntimeError(f"Failed to fetch calendar from Mawaqit: {e}") from e
 
     soup = BeautifulSoup(r.text, "html.parser")
     script = soup.find("script", string=re.compile(r"var confData ="))
 
     if not script:
-        raise HTTPException(status_code=500, detail="confData not found")
+        raise RuntimeError("confData script not found in page")
 
     match = re.search(r"var confData = (.*?);", script.string, re.DOTALL)
     if not match:
-        raise HTTPException(status_code=500, detail="confData parse failed")
+        raise RuntimeError("Failed to parse confData from script")
 
     try:
         conf_data = json.loads(match.group(1))
         calendar = conf_data["calendar"]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except (KeyError, TypeError, json.JSONDecodeError) as e:
+        raise RuntimeError(f"Failed to extract calendar from confData: {e}") from e
 
-    "if calendar is invalid, raise do not replace existing calendar and log an error but it is not an http error"
+    # Validate calendar before replacing the existing one
     try:
         validate_calendar(calendar)
     except ValueError as e:
         logger.error(f"Invalid calendar data: {e}")
         raise
+    
     with open(CALENDAR_TMP_PATH, "w") as f:
         json.dump(calendar, f)
     os.replace(CALENDAR_TMP_PATH, CALENDAR_PATH)
