@@ -9,6 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 def schedule_today_prayers(scheduler: BackgroundScheduler) -> None:
+    """
+    Schedule athan playback for today's remaining prayer times.
+    
+    Args:
+        scheduler: The APScheduler BackgroundScheduler instance
+        
+    Only schedules prayers that haven't occurred yet today.
+    """
     times = get_today_prayer_times()
     today = datetime.today()
 

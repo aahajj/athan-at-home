@@ -38,6 +38,18 @@ source .env/bin/activate
 pip3 install -r requirements.txt
 ```
 
+### Configuration
+
+Set the `MASJID_ID` environment variable to your masjid's ID from Mawaqit:
+
+```bash
+export MASJID_ID="your-masjid-id-here"
+```
+
+You can find your masjid ID by visiting the Mawaqit website and looking at the URL (e.g., `https://mawaqit.net/de/m/your-masjid-id`).
+
+### Running the Application
+
 The project includes a Bash script `athan.sh` to start or stop the app. Make it executable first:
 
 ```bash
